@@ -1,0 +1,6 @@
+.DS_Store
+target/**
+!target/criterion
+!target/criterion/Quick Sort
+!target/criterion/Quick Sort/report
+!target/criterion/Quick Sort/report/lines.svg
