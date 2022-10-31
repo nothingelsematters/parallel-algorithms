@@ -2,7 +2,7 @@ use criterion::{
     criterion_group, criterion_main, measurement::Measurement, BenchmarkGroup, BenchmarkId,
     Criterion, PlottingBackend,
 };
-use parallel_quick_sort::{parallel, sequential};
+use parallel_algorithms::quick_sort::{parallel, sequential};
 
 fn add_bench<M: Measurement, F>(group: &mut BenchmarkGroup<M>, name: &str, v: &Vec<u32>, f: F)
 where

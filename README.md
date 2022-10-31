@@ -1,6 +1,8 @@
 # Advanced Parallel Algorithms
 
-## Results
+## results
+
+### quick sort
 
 |                 | `Sequential`              | `Parallel: 4 threads`            | `Parallel: 4 threads, 1_000 block` |
 | :-------------- | :------------------------ | :------------------------------- | :--------------------------------- |
@@ -10,14 +12,16 @@
 
 ![lines](target/criterion/Quick%20Sort/report/lines.svg)
 
-## How to use
+### bfs
 
-### Run benchmarks and generate plots
+### how to use
+
+#### run benchmarks and generate plots
 
 - install `Cargo`
 - `cargo bench`
 
-### Run benchmarks and generate markdown table
+#### run benchmarks and generate markdown table
 
 - `cargo install criterion`
 - `cargo install criterion-table`

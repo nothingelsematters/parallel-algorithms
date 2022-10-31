@@ -1,4 +1,2 @@
-pub mod parallel;
-pub mod sequential;
-#[cfg(test)]
-mod test_utils;
+pub mod bfs;
+pub mod quick_sort;

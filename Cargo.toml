@@ -1,5 +1,5 @@
 [package]
-name = "parallel-quick-sort"
+name = "parallel-algorithms"
 version = "0.1.0"
 authors = ["Simon Naumov <daretoodefy@gmail.com>"]
 edition = "2018"
@@ -13,5 +13,9 @@ criterion-table = "0.4.2"
 rand = "0.8.5"
 
 [[bench]]
-name = "bench"
+name = "quick_sort"
+harness = false
+
+[[bench]]
+name = "bfs"
 harness = false

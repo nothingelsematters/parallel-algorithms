@@ -28,6 +28,6 @@ pub(crate) fn partition<T: Ord>(slice: &mut [T]) -> usize {
 pub mod tests {
     #[test]
     fn correctness_test() {
-        crate::test_utils::correctness_test(super::quick_sort);
+        crate::quick_sort::test_utils::correctness_test(super::quick_sort);
     }
 }
