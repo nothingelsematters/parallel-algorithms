@@ -17,7 +17,7 @@ where
 }
 
 fn quick_sort_bench(c: &mut Criterion) {
-    let mut group = c.benchmark_group("Quick Sort");
+    let mut group = c.benchmark_group("quick-sort");
 
     for len in &[
         10_000_000,
@@ -28,12 +28,12 @@ fn quick_sort_bench(c: &mut Criterion) {
     ] {
         let v: Vec<u32> = (0..*len).map(|_| rand::random::<u32>()).collect();
 
-        add_bench(&mut group, "Sequential", &v, sequential::quick_sort);
+        add_bench(&mut group, "sequential", &v, sequential::quick_sort);
 
-        add_bench(&mut group, "Parallel: 4 threads", &v, |v| {
+        add_bench(&mut group, "parallel: 4 threads", &v, |v| {
             parallel::quick_sort_with_thread_pool(v, 4, 1).expect("Successful pool creation")
         });
-        add_bench(&mut group, "Parallel: 4 threads, 1_000 block", &v, |v| {
+        add_bench(&mut group, "parallel: 4 threads, 1_000 block", &v, |v| {
             parallel::quick_sort_with_thread_pool(v, 4, 1_000).expect("Successful pool creation")
         });
     }

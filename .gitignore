@@ -1,6 +1,9 @@
 .DS_Store
 target/**
 !target/criterion
-!target/criterion/Quick Sort
-!target/criterion/Quick Sort/report
-!target/criterion/Quick Sort/report/lines.svg
+!target/criterion/quick-sort
+!target/criterion/quick-sort/report
+!target/criterion/quick-sort/report/lines.svg
+!target/criterion/bfs
+!target/criterion/bfs/report
+!target/criterion/bfs/report/lines.svg

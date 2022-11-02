@@ -23,15 +23,13 @@ pub fn quick_sort_with_thread_pool<T: Ord + Send>(
     rayon::ThreadPoolBuilder::new()
         .num_threads(num_threads)
         .build()
-        .map(|pool| {
-            pool.install(|| quick_sort(slice, block));
-        })
+        .map(|pool| pool.install(|| quick_sort(slice, block)))
 }
 
 #[cfg(test)]
 pub mod tests {
     #[test]
     fn correctness_test() {
-        crate::quick_sort::test_utils::correctness_test(|v| super::quick_sort(v, 1));
+        crate::quick_sort::test_utils::correctness_test(|v| super::quick_sort(v, 1))
     }
 }
