@@ -1,6 +1,6 @@
 use criterion::{
-    criterion_group, criterion_main, measurement::Measurement, BenchmarkGroup, BenchmarkId,
-    Criterion, PlottingBackend,
+    criterion_group, criterion_main, measurement::Measurement, BatchSize, BenchmarkGroup,
+    BenchmarkId, Criterion, PlottingBackend,
 };
 use parallel_algorithms::quick_sort::{parallel, sequential};
 
@@ -9,10 +9,7 @@ where
     F: Fn(&mut [u32]),
 {
     group.bench_with_input(BenchmarkId::new(name, v.len()), v, |b, v| {
-        b.iter(|| {
-            let mut v = v.clone();
-            f(&mut v);
-        })
+        b.iter_batched(|| v.clone(), |mut v| f(&mut v), BatchSize::SmallInput)
     });
 }
 

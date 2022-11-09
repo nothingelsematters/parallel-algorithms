@@ -1,46 +1,44 @@
 use std::collections::VecDeque;
 
-use super::AdjacencyMatrix;
+use super::Graph;
 
-/// Precondition: matrix dimensions are the same.
 /// Returns breadth first search trace.
-pub fn bfs(adjacency_matrix: &AdjacencyMatrix) -> Vec<usize> {
-    if adjacency_matrix.is_empty() {
-        return Vec::new();
-    }
-
+pub fn bfs<G: Graph>(g: &G, from: usize, to: usize) -> Option<usize> {
     let mut queue = VecDeque::new();
-    let mut visited = vec![false; adjacency_matrix.len()];
-    let mut trace = Vec::with_capacity(adjacency_matrix.len());
+    let mut depth = vec![None; g.size()];
 
-    queue.push_back(0);
+    queue.push_back(from);
+    depth[from] = Some(0);
 
     while let Some(current) = queue.pop_front() {
-        if visited[current] {
-            continue;
-        }
+        let current_depth = match depth[current] {
+            Some(x) => x,
+            None => continue,
+        };
 
-        trace.push(current);
-        visited[current] = true;
-
-        adjacency_matrix[current]
-            .iter()
-            .enumerate()
-            .filter(|(_, x)| **x)
-            .map(|(i, _)| i)
-            .filter(|i| !visited[*i])
-            .for_each(|i| queue.push_back(i));
+        g.neighbours(current).into_iter().for_each(|i| {
+            if depth[i].is_none() {
+                depth[i] = Some(current_depth + 1);
+                queue.push_back(i)
+            }
+        });
     }
 
-    trace
+    depth[to]
 }
 
 #[cfg(test)]
 pub mod tests {
     use super::bfs;
+    use crate::bfs::test_utils;
 
     #[test]
     fn simple_correctness_test() {
-        crate::bfs::test_utils::simple_correctness_test(bfs)
+        test_utils::simple_correctness_test(bfs)
+    }
+
+    #[test]
+    fn cubic_graph_test() {
+        test_utils::cubic_graph_test(bfs)
     }
 }
