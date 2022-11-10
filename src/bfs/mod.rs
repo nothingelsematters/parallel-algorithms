@@ -7,6 +7,8 @@ pub trait Graph {
     fn size(&self) -> usize;
 
     fn neighbours(&self, index: usize) -> Vec<usize>;
+
+    fn neighbours_size(&self, index: usize) -> usize;
 }
 
 pub struct AdjacencyMatrixGraph {
@@ -38,6 +40,10 @@ impl Graph for AdjacencyMatrixGraph {
             .map(|(i, _)| i)
             .collect()
     }
+
+    fn neighbours_size(&self, index: usize) -> usize {
+        self.adjacency_matrix[index].iter().filter(|x| **x).count()
+    }
 }
 
 pub struct EdgesGraph {
@@ -57,6 +63,10 @@ impl Graph for EdgesGraph {
 
     fn neighbours(&self, index: usize) -> Vec<usize> {
         self.edges[index].clone()
+    }
+
+    fn neighbours_size(&self, index: usize) -> usize {
+        self.edges[index].len()
     }
 }
 
@@ -102,5 +112,34 @@ impl Graph for CubicGraph {
         }
 
         neighbours
+    }
+
+    fn neighbours_size(&self, index: usize) -> usize {
+        let i = index / self.size.pow(2);
+        let j = (index - self.size.pow(2) * i) / self.size;
+        let k = index - self.size.pow(2) * i - j * self.size;
+
+        let mut result = 0;
+
+        if i != 0 {
+            result += 1;
+        }
+        if i != self.size - 1 {
+            result += 1;
+        }
+        if j != 0 {
+            result += 1;
+        }
+        if j != self.size - 1 {
+            result += 1;
+        }
+        if k != 0 {
+            result += 1;
+        }
+        if k != self.size - 1 {
+            result += 1;
+        }
+
+        result
     }
 }

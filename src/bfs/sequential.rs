@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 
 use super::Graph;
 
-/// Returns breadth first search trace.
+/// Returns the shortest path length between `from` and `to` vertices.
 pub fn bfs<G: Graph>(g: &G, from: usize, to: usize) -> Option<usize> {
     let mut queue = VecDeque::new();
     let mut depth = vec![None; g.size()];
