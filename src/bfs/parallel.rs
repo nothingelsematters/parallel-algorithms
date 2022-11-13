@@ -71,24 +71,26 @@ where
 
         let new_frontier_len = *degree.last().unwrap();
         if new_frontier_len > new_frontier.len() {
-            for _ in 0..new_frontier_len - new_frontier.len() {
+            let additional = new_frontier_len - new_frontier.len();
+
+            new_frontier.reserve(additional);
+            for _ in 0..additional {
                 new_frontier.push(None);
             }
         }
 
         frontier.into_par_iter().enumerate().for_each(|(i, v)| {
-            let v_depth = depth[v].unwrap();
-            let i_degree = if i == 0 { 0 } else { degree[i - 1] };
-
             g.neighbours(v)
                 .into_iter()
+                .filter(|u| taken.compare_and_set(*u))
                 .enumerate()
-                .filter(|(_, u)| taken.compare_and_set(*u))
                 .for_each(|(j, u)| {
+                    let i_degree = if i == 0 { 0 } else { degree[i - 1] };
+
                     #[allow(clippy::cast_ref_to_mut)]
                     unsafe {
                         *(&new_frontier[i_degree + j] as *const _ as *mut _) = Some(u);
-                        *(&depth[u] as *const _ as *mut _) = Some(v_depth + 1);
+                        *(&depth[u] as *const _ as *mut _) = Some(depth[v].unwrap() + 1);
                     }
                 })
         });
@@ -96,7 +98,7 @@ where
         frontier = new_frontier
             .iter_mut()
             .take(new_frontier_len)
-            .filter_map(|x| x.take())
+            .filter_map(Option::take)
             .collect();
     }
 
