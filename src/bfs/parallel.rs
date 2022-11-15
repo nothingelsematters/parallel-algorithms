@@ -1,6 +1,4 @@
-use rayon::prelude::{
-    IndexedParallelIterator, IntoParallelIterator, IntoParallelRefIterator, ParallelIterator,
-};
+use rayon::prelude::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 use rayon::ThreadPoolBuildError;
 use std::sync::atomic::AtomicUsize;
 use std::sync::{atomic::Ordering, Arc};
@@ -42,6 +40,15 @@ impl AtomicBoolVec {
     }
 }
 
+macro_rules! unsafe_set {
+    ($element:expr => $value:expr) => {
+        #[allow(clippy::cast_ref_to_mut)]
+        unsafe {
+            *(&$element as *const _ as *mut _) = $value;
+        }
+    };
+}
+
 /// Returns the shortest path length between `from` and `to` vertices.
 pub fn bfs<'a, G: Graph>(g: Arc<&'a G>, from: usize, to: usize) -> Option<usize>
 where
@@ -54,7 +61,11 @@ where
     let mut new_frontier = Vec::new();
     let taken = AtomicBoolVec::new(g.size());
 
-    while !frontier.is_empty() {
+    for current_depth in 1usize.. {
+        if frontier.is_empty() {
+            break;
+        }
+
         let degree = frontier
             .par_iter()
             .map(|v| g.neighbours_size(*v))
@@ -71,35 +82,27 @@ where
 
         let new_frontier_len = *degree.last().unwrap();
         if new_frontier_len > new_frontier.len() {
-            let additional = new_frontier_len - new_frontier.len();
-
-            new_frontier.reserve(additional);
-            for _ in 0..additional {
-                new_frontier.push(None);
-            }
+            new_frontier.resize(new_frontier_len, None);
         }
 
-        frontier.into_par_iter().enumerate().for_each(|(i, v)| {
-            g.neighbours(v)
+        frontier.par_iter().enumerate().for_each(|(i, v)| {
+            g.neighbours(*v)
                 .into_iter()
                 .filter(|u| taken.compare_and_set(*u))
                 .enumerate()
                 .for_each(|(j, u)| {
                     let i_degree = if i == 0 { 0 } else { degree[i - 1] };
-
-                    #[allow(clippy::cast_ref_to_mut)]
-                    unsafe {
-                        *(&new_frontier[i_degree + j] as *const _ as *mut _) = Some(u);
-                        *(&depth[u] as *const _ as *mut _) = Some(depth[v].unwrap() + 1);
-                    }
+                    unsafe_set!(new_frontier[i_degree + j] => Some(u));
+                    unsafe_set!(depth[u] => Some(current_depth));
                 })
         });
 
-        frontier = new_frontier
+        frontier.clear();
+        new_frontier
             .iter_mut()
             .take(new_frontier_len)
             .filter_map(Option::take)
-            .collect();
+            .for_each(|i| frontier.push(i));
     }
 
     depth[to]
