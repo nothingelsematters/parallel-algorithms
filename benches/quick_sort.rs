@@ -16,16 +16,12 @@ where
 fn quick_sort_bench(c: &mut Criterion) {
     let mut group = c.benchmark_group("quick-sort");
 
-    for len in &[
-        10_000_000,
-        50_000_000,
-        100_000_000,
-        500_000_000,
-        1_000_000_000,
-    ] {
+    for len in &[10_000_000, 50_000_000, 100_000_000, 500_000_000] {
         let v: Vec<u32> = (0..*len).map(|_| rand::random::<u32>()).collect();
 
         add_bench(&mut group, "sequential", &v, sequential::quick_sort);
+
+        add_bench(&mut group, "standard sequential", &v, |v| v.sort());
 
         add_bench(&mut group, "parallel: 4 threads", &v, |v| {
             parallel::quick_sort_with_thread_pool(v, 4, 1).expect("Successful pool creation")
